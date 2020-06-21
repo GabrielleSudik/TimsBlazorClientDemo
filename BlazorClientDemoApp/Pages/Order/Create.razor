@@ -1,0 +1,114 @@
+﻿@page "/Order/Create"
+
+@inject HttpClient http
+@inject NavigationManager navigationManager
+
+<h3>Create</h3>
+
+@if (string.IsNullOrWhiteSpace(errorString) == false)
+{
+    <h4>There's been an error:</h4>
+    <p>@errorString</p>
+}
+else if (foodItems.Count == 0)
+{
+    <h4>The menu is loading...</h4>
+}
+else
+{
+    <EditForm Model="@order" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary Model="@order" />
+        <div class="form-group">
+            <label class="control-label">Item to order</label>
+            <select @onchange="FoodItemChange" class="form-control">
+                <option value="">Select a meal ...</option>
+                @foreach (var f in foodItems)
+                {
+                    <option value="@f.Id">@f.Title</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Quantity</label>
+            <InputNumber @bind-Value="order.Quantity" class="form-control" />
+            <ValidationMessage For="@(() => order.Quantity)" class="text-danger" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Order's Name</label>
+            <InputText @bind-Value="order.OrderName" class="form-control" />
+            <ValidationMessage For="@(() => order.OrderName)" class="text-danger" />
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Submit order" class="btn btn-primary" />
+        </div>
+
+    </EditForm>
+}
+
+@code {
+
+    private OrderModel order = new OrderModel();
+
+    private List<FoodModel> foodItems = new List<FoodModel>();
+
+    private string errorString;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        //in our other apps we populate the dropdown list of food items.
+        //they are all the same-ish. Here must be different.
+
+        HttpResponseMessage response = await http.GetAsync("api/food");
+        //HttpResponseMessage returns data and status code
+
+        if (response.IsSuccessStatusCode)
+        {
+            foodItems = await response.Content.ReadFromJsonAsync<List<FoodModel>>();
+            //ie, if 200 message, get the food list, converting from json.
+            //cuz this code is getting the data from an api in json format.
+        }
+        else
+        {
+            errorString = response.ReasonPhrase;
+        }
+    }
+
+    private void FoodItemChange(ChangeEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(e.Value.ToString()) == false)
+        {
+            order.FoodId = int.Parse(e.Value.ToString());
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        order.Total = order.Quantity * foodItems.Where(x => x.Id == order.FoodId).First().Price;
+
+        try
+        {
+            var response = await http.PostAsJsonAsync("api/order", order);
+            //this converts "order" to json then posts it to the path.
+
+            //at this point we need a new model: OrderCreateResultsModel
+            //all it contains is an Id property. (but we can expand later if we want)
+            var contents = await response.Content.ReadFromJsonAsync<OrderCreateResultsModel>();
+
+            //Tim uses var a lot.
+
+            order = new OrderModel();
+            //navigationManager.NavigateTo($"order/display/{contents.Id}");
+        }
+        catch (Exception ex)
+        {
+
+            errorString = ex.Message;
+        }
+
+    }
+}
+
+<!--Injecting HttpClient is different from Blazor Server.
+    We need it tell our pages how to handle http.-->

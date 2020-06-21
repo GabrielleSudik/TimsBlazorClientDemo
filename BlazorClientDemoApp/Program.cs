@@ -15,9 +15,15 @@ namespace BlazorClientDemoApp
         public static async Task Main(string[] args)
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
-            builder.RootComponents.Add<App>("app");
+            builder.RootComponents.Add<App>("app"); //where the app starts.
 
-            builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+            //services! where to add DI.
+            builder.Services.AddTransient(sp => new HttpClient 
+            {
+                //BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
+                BaseAddress = new Uri("https://api.whichaspnetcore.com/")  //this is pointing to Tim's API app.
+                                                                            //if he ever changes that, this won't work.
+            });
 
             await builder.Build().RunAsync();
         }

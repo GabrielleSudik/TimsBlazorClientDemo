@@ -1,0 +1,53 @@
+Tim Corey's Which ASP.NET Core
+Blazor Client App
+
+Tim says Blazor Client will be different than the other
+three UI apps. And it will use the API we made to get data.
+
+It will look very similar to Blazor Server, but it's not.
+For example, we won't add the reference to our Library project,
+because the app won't be able to use it, because
+everything Blazor Client runs on the client.
+
+-- Install Nuget Package --
+
+microsoft.aspnetcore.blazor.httpclient
+(might need to turn on prerelease)
+It inclused methods we need for httpclient.
+
+-- Configure Dependency Injection --
+
+Program.cs (No Startup.cs file!)
+This is actually a console app.
+(Aren't all asp.net core web apps, technically?)
+
+Note the .Services stuff. That's the DI spot.
+(Different from the other four apps.)
+Specifically, use:
+BaseAddress = new Uri("https://api.whichaspnetcore.com/") 
+which will tell this app to work with the Tim's version of our API project.
+(If your version is deployed, you can use it, but it's not deployed.)
+
+-- Routing --
+
+Program.cs.  This line:
+builder.RootComponents.Add<App>("app"); 
+The "app" points to App.razor. Check that out.
+It's got the info about how routes will work.
+It's like Blazor Server. Ex: 
+Top of boilerplate Counter.razor page: "@page "/counter""
+Top of boilerplate Index.razor page: "@page "/""
+
+(FYI we deleted the boilerplate fetch weather data stuff)
+
+-- Creating Data --
+
+New Folder - Order. New item - Razor Component - Create.razor.
+See notes.
+
+You also added FoodModel and OrderModel, since you won't be accessing
+them via the Library project, like you do for the other apps.
+Also OrderUpdateModel, just to get it out of the way.
+
+Finally, in _Imports:
+@using BlazorClientDemoApp.Models
