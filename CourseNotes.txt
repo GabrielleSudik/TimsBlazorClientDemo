@@ -51,3 +51,31 @@ Also OrderUpdateModel, just to get it out of the way.
 
 Finally, in _Imports:
 @using BlazorClientDemoApp.Models
+
+-- Reading Data --
+
+New item in Order folder: Display.razor
+New class: OrderResultModel.cs
+New folder: Food. New Razor Component: List.razor
+
+Hmm, something(s) in your code isn't working right.
+Can't find the problem. :\
+
+-- Updating Data --
+
+It's the same code almost as Blazor Server.
+But use the HttpClient methods like PutAsJsonAsync
+instead of the methods we wrote in the Library project.
+(This is true for all of your CRUD methods, really.)
+
+-- Deleting Data --
+
+Again, similar code to Blazor Server
+except your method relies on HttpClient methods
+not your Library project.
+
+-- Deploying --
+
+Again, not deployed because you're not set up.
+
+--- End of Section on Blazor Client ---
